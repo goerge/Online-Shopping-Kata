@@ -1,5 +1,7 @@
 package codingdojo;
 
+import java.util.function.Consumer;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -7,6 +9,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class OnlineShoppingTest {
+
+  private static final Consumer<ModelObject> NO_OP_DATABASE_ADAPTER = modelObject -> {
+  };
 
   private Store backaplan;
   private Store nordstan;
@@ -54,8 +59,7 @@ public class OnlineShoppingTest {
     cart.addItem(masterclass);
     cart.addItem(makeoverNordstan);
 
-    Session session = new Session(modelObject -> {
-    });
+    Session session = new Session(NO_OP_DATABASE_ADAPTER);
     session.put("STORE", nordstan);
     session.put("DELIVERY_INFO", deliveryInfo);
     session.put("CART", cart);
