@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class OnlineShoppingTest {
 
@@ -47,6 +48,27 @@ public class OnlineShoppingTest {
     makeoverBackaplan = new StoreEvent("Makeover", backaplan);
   }
 
+  @Test
+  void resetStore() {
+    final Session session = new Session(NO_OP_DATABASE_ADAPTER);
+    final OnlineShopping shopping = new OnlineShopping(session);
+
+    shopping.switchStore(null);
+
+    assertNull(session.get("STORE"));
+  }
+
+  @Test
+  void resetStoreWithDeliveryInformationSetDeliveryTypeToShipping() {
+    final Session session = new Session(NO_OP_DATABASE_ADAPTER);
+    session.put("DELIVERY_INFO", new DeliveryInformation("DRONE", null, 0L));
+    final OnlineShopping shopping = new OnlineShopping(session);
+
+    shopping.switchStore(null);
+
+    assertEquals(((DeliveryInformation)session.get("DELIVERY_INFO")).getType(), "SHIPPING");
+  }
+
   @Disabled("make this test work")
   @Test
   public void switchDeliveryTypeToDrone() {
@@ -68,4 +90,6 @@ public class OnlineShoppingTest {
     shopping.switchStore(backaplan);
     assertEquals("DRONE", ((DeliveryInformation) session.get("DELIVERY_INFO")).getType());
   }
+
+
 }
