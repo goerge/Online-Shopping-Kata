@@ -69,9 +69,8 @@ public class OnlineShoppingTest {
     assertEquals(((DeliveryInformation)session.get("DELIVERY_INFO")).getType(), "SHIPPING");
   }
 
-  @Disabled("make this test work")
   @Test
-  public void switchDeliveryTypeToDrone() {
+  public void switchDeliveryTypeToDroneIfShopSupportsDrones() {
     DeliveryInformation deliveryInfo = new DeliveryInformation("HOME_DELIVERY", nordstan, 60);
     deliveryInfo.setDeliveryAddress("NEARBY");
 
@@ -91,5 +90,43 @@ public class OnlineShoppingTest {
     assertEquals("DRONE", ((DeliveryInformation) session.get("DELIVERY_INFO")).getType());
   }
 
+  @Test
+  void ifWeightExceedsDroneCapacityDoNotSwitchToDroneDelivery() {
+    final DeliveryInformation deliveryInfo = new DeliveryInformation("DRONE", backaplan, 0L);
+    deliveryInfo.setDeliveryAddress("NEARBY");
+    final Item heavyItem = new Item("heavy thing", "HEAVY", 501L);
+    backaplan.addStockedItems(heavyItem);
+    final Cart cart = new Cart();
+    cart.addItem(heavyItem);
 
+    final Session session = new Session(NO_OP_DATABASE_ADAPTER);
+    session.put("DELIVERY_INFO", deliveryInfo);
+    session.put("CART", cart);
+    final OnlineShopping shopping = new OnlineShopping(session);
+
+    shopping.switchStore(backaplan);
+
+    assertEquals("HOME_DELIVERY", ((DeliveryInformation) session.get("DELIVERY_INFO")).getType());
+  }
+
+  @Test
+  public void switchFromDroneToHomeDeliveryIfShopDoesNotSupportDrones() {
+    DeliveryInformation deliveryInfo = new DeliveryInformation("DRONE", backaplan, 60);
+    deliveryInfo.setDeliveryAddress("NEARBY");
+
+    Cart cart = new Cart();
+    cart.addItem(cherryBloom);
+    cart.addItem(blusherBrush);
+    cart.addItem(masterclass);
+    cart.addItem(makeoverNordstan);
+
+    Session session = new Session(NO_OP_DATABASE_ADAPTER);
+    session.put("STORE", backaplan);
+    session.put("DELIVERY_INFO", deliveryInfo);
+    session.put("CART", cart);
+    OnlineShopping shopping = new OnlineShopping(session);
+
+    shopping.switchStore(nordstan);
+    assertEquals("HOME_DELIVERY", ((DeliveryInformation) session.get("DELIVERY_INFO")).getType());
+  }
 }

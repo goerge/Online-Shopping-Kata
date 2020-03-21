@@ -26,7 +26,7 @@ public class OnlineShopping {
      * website.
      *
      */
-    public void switchStore(Store storeToSwitchTo) {
+    public void switchStore(final Store storeToSwitchTo) {
         Cart cart = (Cart) session.get("CART");
         DeliveryInformation deliveryInformation = (DeliveryInformation) session.get("DELIVERY_INFO");
         if (storeToSwitchTo == null) {
@@ -66,7 +66,7 @@ public class OnlineShopping {
                 Store currentStore = (Store) session.get("STORE");
                 if (deliveryInformation != null
                         && deliveryInformation.getType() != null
-                        && "HOME_DELIVERY".equals(deliveryInformation.getType())
+                        && ("HOME_DELIVERY".equals(deliveryInformation.getType()) || "DRONE".equals(deliveryInformation.getType()))
                         && deliveryInformation.getDeliveryAddress() != null) {
                     if (!((LocationService) session.get("LOCATION_SERVICE")).isWithinDeliveryRange(storeToSwitchTo, deliveryInformation.getDeliveryAddress())) {
                         deliveryInformation.setType("PICKUP");
@@ -74,6 +74,11 @@ public class OnlineShopping {
                     } else {
                         deliveryInformation.setTotalWeight(weight);
                         deliveryInformation.setPickupLocation(storeToSwitchTo);
+                        if(storeToSwitchTo.hasDroneDelivery() && weight < 500L) {
+                            deliveryInformation.setType("DRONE");
+                        } else {
+                            deliveryInformation.setType("HOME_DELIVERY");
+                        }
                     }
                 } else {
                     if (deliveryInformation != null
