@@ -3,6 +3,7 @@ package codingdojo;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Allows the OnlineShopping to access data classes
@@ -13,10 +14,17 @@ public class Session {
 
     private final Map<String, ModelObject> session;
 
+    private Consumer<ModelObject> databaseAdapter = ModelObject::saveToDatabase;
+
     public Session() {
         session = new HashMap<>();
         session.put("CART", new Cart());
         session.put("LOCATION_SERVICE", new LocationService());
+    }
+
+    public Session(Consumer<ModelObject> databaseAdapter) {
+        this();
+        this.databaseAdapter = databaseAdapter;
     }
 
     public ModelObject get(String key) {
@@ -31,7 +39,7 @@ public class Session {
         for (String key : session.keySet()) {
             ModelObject entity = session.get(key);
             if (entity != null) {
-                entity.saveToDatabase();
+                databaseAdapter.accept(entity);
             }
         }
     }

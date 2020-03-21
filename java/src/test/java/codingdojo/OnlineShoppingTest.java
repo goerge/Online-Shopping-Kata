@@ -2,6 +2,7 @@ package codingdojo;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -43,8 +44,9 @@ public class OnlineShoppingTest {
 
     }
 
+    @Disabled("make this test work")
     @Test
-    public void switchStore() throws Exception {
+    public void switchDeliveryTypeToDrone() throws Exception {
         DeliveryInformation deliveryInfo = new DeliveryInformation("HOME_DELIVERY", nordstan, 60);
         deliveryInfo.setDeliveryAddress("NEARBY");
 
@@ -54,16 +56,14 @@ public class OnlineShoppingTest {
         cart.addItem(masterclass);
         cart.addItem(makeoverNordstan);
 
-        Session session = new Session();
+        Session session = new Session(modelObject -> {});
         session.put("STORE", nordstan);
         session.put("DELIVERY_INFO", deliveryInfo);
         session.put("CART", cart);
         OnlineShopping shopping = new OnlineShopping(session);
 
-        // TODO: make this test work
-        // shopping.switchStore(backaplan);
-        // assertEquals("DRONE", ((DeliveryInformation)session.get("DELIVERY_INFO")).getType());
-
+         shopping.switchStore(backaplan);
+         assertEquals("DRONE", ((DeliveryInformation)session.get("DELIVERY_INFO")).getType());
     }
 
 
